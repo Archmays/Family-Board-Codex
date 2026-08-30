@@ -13,7 +13,7 @@ import {
   sendJson,
   serveStaticFile,
 } from './http-utils.mjs';
-import { MEDIA_LIMITS, storeMediaUpload } from './media-upload.mjs';
+import { discardMediaUpload, MEDIA_LIMITS, storeMediaUpload } from './media-upload.mjs';
 import { Publisher } from './publisher.mjs';
 
 const MODULE_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
@@ -49,6 +49,14 @@ function requirePreflightToken(body) {
     });
   }
   return body.preflightToken;
+}
+
+function boardReferencesUploadedMedia(board, photo) {
+  return [...board.schedule, ...board.tasks].some((item) => (item.photos ?? []).some(
+    (existing) => existing.id === photo?.id
+      || existing.src === photo?.src
+      || existing.thumbnail === photo?.thumbnail,
+  ));
 }
 
 function openBrowser(url) {
@@ -161,10 +169,42 @@ export async function createFamilyBoardServer({
         });
       }
       const bytes = await readRequestBody(request, MEDIA_LIMITS.requestBytes);
-      sendJson(response, 201, await storeMediaUpload({
+      let stored;
+      let responseClosed = false;
+      const cleanupInterruptedUpload = () => {
+        responseClosed = true;
+        if (stored && !response.writableFinished) {
+          void discardMediaUpload({ projectRoot: resolvedRoot, photo: stored.photo }).catch(() => {});
+        }
+      };
+      response.once('close', cleanupInterruptedUpload);
+      stored = await storeMediaUpload({
         projectRoot: resolvedRoot,
         body: bytes,
         contentType,
+      });
+      if (responseClosed || response.destroyed) {
+        await discardMediaUpload({ projectRoot: resolvedRoot, photo: stored.photo });
+        return true;
+      }
+      sendJson(response, 201, stored);
+      return true;
+    }
+
+    if (pathname === '/api/media/discard') {
+      const body = requireObjectBody(await readJsonBody(request, 64 * 1024));
+      sendJson(response, 200, await store.withExclusive(async () => {
+        const snapshot = await store.getSnapshotUnlocked();
+        if (boardReferencesUploadedMedia(snapshot.board, body.photo)) {
+          throw new AppError('A saved board item already references this photo.', {
+            status: 409,
+            code: 'media_in_use',
+          });
+        }
+        return discardMediaUpload({
+          projectRoot: resolvedRoot,
+          photo: body.photo,
+        });
       }));
       return true;
     }

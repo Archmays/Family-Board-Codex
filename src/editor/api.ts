@@ -139,6 +139,13 @@ export async function uploadPhoto(
   return payload.photo;
 }
 
+export function discardPhotoUpload(photo: PhotoAttachment): Promise<{ discarded: true }> {
+  return jsonRequest<{ discarded: true }>("/api/media/discard", {
+    method: "POST",
+    body: JSON.stringify({ photo }),
+  });
+}
+
 export function getPublishPreflight(baseRevision: string): Promise<PublishPreflight> {
   return jsonRequest<PublishPreflight>("/api/publish/preflight", {
     method: "POST",

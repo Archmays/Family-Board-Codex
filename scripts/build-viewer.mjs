@@ -18,6 +18,10 @@ const docsDir = path.join(REPO_ROOT, "docs");
 const viteConfigPath = path.join(REPO_ROOT, "vite.viewer.config.ts");
 
 try {
+  // The editor runs Vite in development mode in this same process tree. Force
+  // the standalone Pages build back to production before Vite is imported so
+  // publication cannot accidentally bundle React's development runtime.
+  process.env.NODE_ENV = "production";
   const board = await readAndValidateBoard(boardPath, validateBoard);
   const mediaReferences = collectMediaReferences(board);
 

@@ -3,6 +3,7 @@ import { BoardWorkspace } from "../shared/BoardWorkspace";
 import type { Board, BoardTask, BoardView, Course, PhotoAttachment } from "../shared/types";
 import {
   ApiError,
+  discardPhotoUpload,
   getBoard,
   getPublishPreflight,
   getRevision,
@@ -95,12 +96,13 @@ function Field({ label, children, wide = false }: { label: string; children: Rea
 
 interface PhotoManagerProps {
   photos: PhotoAttachment[];
-  onAppend: (photos: PhotoAttachment[]) => void;
+  onAppend: (photos: PhotoAttachment[]) => boolean;
   onChange: (photos: PhotoAttachment[]) => void;
   onError: (message: string) => void;
+  onWorkChange: (delta: 1 | -1) => void;
 }
 
-function PhotoManager({ photos, onAppend, onChange, onError }: PhotoManagerProps) {
+function PhotoManager({ photos, onAppend, onChange, onError, onWorkChange }: PhotoManagerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -109,6 +111,7 @@ function PhotoManager({ photos, onAppend, onChange, onError }: PhotoManagerProps
   const addFiles = useCallback(async (files: File[]) => {
     if (!files.length || uploading) return;
     setUploading(true);
+    onWorkChange(1);
     try {
       for (const file of files) {
         const processed = await processPhoto(file);
@@ -120,15 +123,27 @@ function PhotoManager({ photos, onAppend, onChange, onError }: PhotoManagerProps
         // Attach each successful file immediately. This keeps earlier files in
         // a multi-upload if a later file fails and merges against the latest
         // board state instead of an async, stale photos closure.
-        onAppend([uploaded]);
+        try {
+          if (!onAppend([uploaded])) {
+            throw new Error("照片处理完成时，关联的课程或事项已不存在。请重新选择照片。");
+          }
+        } catch (error) {
+          try {
+            await discardPhotoUpload(uploaded);
+          } catch (cleanupError) {
+            throw new Error(`${messageFromError(error)}；未关联照片的自动清理失败：${messageFromError(cleanupError)}`);
+          }
+          throw error;
+        }
       }
     } catch (error) {
       onError(messageFromError(error));
     } finally {
+      onWorkChange(-1);
       setUploading(false);
       if (inputRef.current) inputRef.current.value = "";
     }
-  }, [onAppend, onError, uploading]);
+  }, [onAppend, onError, onWorkChange, uploading]);
 
   useEffect(() => {
     const onPaste = (event: ClipboardEvent) => {
@@ -221,16 +236,17 @@ interface DrawerProps {
   onClose: () => void;
   onUpdateCourse: (course: Course) => void;
   onUpdateTask: (task: BoardTask) => void;
-  onAppendCoursePhotos: (courseId: string, photos: PhotoAttachment[]) => void;
-  onAppendTaskPhotos: (taskId: string, photos: PhotoAttachment[]) => void;
+  onAppendCoursePhotos: (courseId: string, photos: PhotoAttachment[]) => boolean;
+  onAppendTaskPhotos: (taskId: string, photos: PhotoAttachment[]) => boolean;
   onCopyCourse: (course: Course) => void;
   onDeleteCourse: (course: Course) => void;
   onDeleteTask: (task: BoardTask) => void;
   onError: (message: string) => void;
+  onPhotoWorkChange: (delta: 1 | -1) => void;
 }
 
 function EditorDrawer(props: DrawerProps) {
-  const { drawer, board, onClose, onUpdateCourse, onUpdateTask, onAppendCoursePhotos, onAppendTaskPhotos, onCopyCourse, onDeleteCourse, onDeleteTask, onError } = props;
+  const { drawer, board, onClose, onUpdateCourse, onUpdateTask, onAppendCoursePhotos, onAppendTaskPhotos, onCopyCourse, onDeleteCourse, onDeleteTask, onError, onPhotoWorkChange } = props;
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const course = drawer?.kind === "course" ? board.schedule.find((item) => item.id === drawer.id) : undefined;
   const task = drawer?.kind === "task" ? board.tasks.find((item) => item.id === drawer.id) : undefined;
@@ -276,7 +292,7 @@ function EditorDrawer(props: DrawerProps) {
             <Field label="地点" wide><input value={course.location} onChange={(event) => onUpdateCourse({ ...course, location: event.target.value })} placeholder="可留空" /></Field>
             <Field label="备注" wide><textarea rows={4} value={course.note} onChange={(event) => onUpdateCourse({ ...course, note: event.target.value })} placeholder="可留空" /></Field>
           </div>
-          <PhotoManager photos={course.photos} onAppend={(photos) => onAppendCoursePhotos(course.id, photos)} onChange={(photos) => onUpdateCourse({ ...course, photos })} onError={onError} />
+          <PhotoManager photos={course.photos} onAppend={(photos) => onAppendCoursePhotos(course.id, photos)} onChange={(photos) => onUpdateCourse({ ...course, photos })} onError={onError} onWorkChange={onPhotoWorkChange} />
         </>}
 
         {task && <>
@@ -298,7 +314,7 @@ function EditorDrawer(props: DrawerProps) {
             </Field>
             <Field label="备注" wide><textarea rows={5} value={task.note} onChange={(event) => onUpdateTask({ ...task, note: event.target.value })} placeholder="可留空" /></Field>
           </div>
-          <PhotoManager photos={task.photos} onAppend={(photos) => onAppendTaskPhotos(task.id, photos)} onChange={(photos) => onUpdateTask({ ...task, photos })} onError={onError} />
+          <PhotoManager photos={task.photos} onAppend={(photos) => onAppendTaskPhotos(task.id, photos)} onChange={(photos) => onUpdateTask({ ...task, photos })} onError={onError} onWorkChange={onPhotoWorkChange} />
         </>}
       </div>
 
@@ -359,6 +375,7 @@ export default function App() {
   const [undoSeconds, setUndoSeconds] = useState(0);
   const [publishPlan, setPublishPlan] = useState<PublishPreflight | null>(null);
   const [publishing, setPublishing] = useState(false);
+  const [photoWorkCount, setPhotoWorkCount] = useState(0);
 
   const boardRef = useRef<Board | null>(null);
   const revisionRef = useRef("");
@@ -366,6 +383,12 @@ export default function App() {
   const dirtyRef = useRef(false);
   const mutationVersionRef = useRef(0);
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve());
+  const photoWorkCountRef = useRef(0);
+
+  const changePhotoWorkCount = useCallback((delta: 1 | -1) => {
+    photoWorkCountRef.current = Math.max(0, photoWorkCountRef.current + delta);
+    setPhotoWorkCount(photoWorkCountRef.current);
+  }, []);
 
   const assignBoard = useCallback((next: Board, isDirty: boolean) => {
     boardRef.current = next;
@@ -387,6 +410,10 @@ export default function App() {
 
   const requestSave = useCallback((kind: "manual" | "auto"): Promise<boolean> => {
     const run = saveQueueRef.current.then(async () => {
+      if (photoWorkCountRef.current > 0) {
+        if (kind === "manual") setNotice("照片仍在处理中；完成后再保存。");
+        return false;
+      }
       if (!dirtyRef.current || !boardRef.current) return true;
       const snapshot = cloneBoard(boardRef.current);
       const capturedVersion = mutationVersionRef.current;
@@ -459,7 +486,7 @@ export default function App() {
       }
     };
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (dirtyRef.current) {
+      if (dirtyRef.current || photoWorkCountRef.current > 0) {
         event.preventDefault();
         event.returnValue = "";
       }
@@ -477,6 +504,10 @@ export default function App() {
       if (!revisionRef.current || saveState === "saving") return;
       try {
         const current = await getRevision();
+        if (current.publishedRevision !== publishedRevisionRef.current) {
+          publishedRevisionRef.current = current.publishedRevision;
+          setPublishedRevision(current.publishedRevision);
+        }
         if (current.revision === revisionRef.current) return;
         const disk = await getBoard();
         if (dirtyRef.current) {
@@ -511,8 +542,9 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [undo]);
 
-  const hasUnsavedDraft = saveState === "dirty" || saveState === "saving" || saveState === "failed";
+  const hasUnsavedDraft = photoWorkCount > 0 || saveState === "dirty" || saveState === "saving" || saveState === "failed";
   const isPublished = !hasUnsavedDraft && Boolean(revision && revision === publishedRevision);
+  const saveLabel = photoWorkCount > 0 ? "正在处理照片" : SAVE_LABELS[saveState];
   const publicationLabel = hasUnsavedDraft
     ? "当前修改尚未发布"
     : isPublished ? "已发布" : "本地已保存、尚未发布";
@@ -532,17 +564,27 @@ export default function App() {
   }, [mutateBoard]);
 
   const appendCoursePhotos = useCallback((courseId: string, photos: PhotoAttachment[]) => {
+    let appended = false;
     mutateBoard((draft) => {
       const course = draft.schedule.find((item) => item.id === courseId);
-      if (course) course.photos.push(...photos);
+      if (course) {
+        course.photos.push(...photos);
+        appended = true;
+      }
     });
+    return appended;
   }, [mutateBoard]);
 
   const appendTaskPhotos = useCallback((taskId: string, photos: PhotoAttachment[]) => {
+    let appended = false;
     mutateBoard((draft) => {
       const task = draft.tasks.find((item) => item.id === taskId);
-      if (task) task.photos.push(...photos);
+      if (task) {
+        task.photos.push(...photos);
+        appended = true;
+      }
     });
+    return appended;
   }, [mutateBoard]);
 
   const addCourse = () => {
@@ -610,6 +652,10 @@ export default function App() {
   };
 
   const beginPublish = async () => {
+    if (photoWorkCountRef.current > 0) {
+      setNotice("照片仍在处理中；完成并保存后再发布。");
+      return;
+    }
     setPublishing(true);
     setNotice(null);
     try {
@@ -634,7 +680,7 @@ export default function App() {
   const confirmPublish = async () => {
     if (!publishPlan) return;
     const confirmedPlan = publishPlan;
-    if (dirtyRef.current || revisionRef.current !== confirmedPlan.revision) {
+    if (photoWorkCountRef.current > 0 || dirtyRef.current || revisionRef.current !== confirmedPlan.revision) {
       setPublishPlan(null);
       setNotice("日程在发布确认前发生了变化。请重新执行发布前检查并确认最新摘要。");
       return;
@@ -699,13 +745,13 @@ export default function App() {
         <div><strong>黄家日程板</strong><span>本地编辑器 · 仅 127.0.0.1</span></div>
       </div>
       <div className="save-ledger" aria-live="polite">
-        <span className={`state-pill state-pill--${saveState}`}>{SAVE_LABELS[saveState]}</span>
+        <span className={`state-pill state-pill--${saveState}`}>{saveLabel}</span>
         <span className={`state-pill ${isPublished ? "state-pill--published" : "state-pill--unpublished"}`}>{publicationLabel}</span>
       </div>
       <div className="editor-commandbar__actions">
         <button className="button" type="button" onClick={openPreview}><Icon name="preview" />只读预览</button>
-        <button className="button" type="button" onClick={() => void requestSave("manual")} disabled={saveState === "saving" || !dirtyRef.current}><Icon name="save" />保存</button>
-        <button className="button button--primary" type="button" onClick={() => void beginPublish()} disabled={publishing || saveState === "saving"}><Icon name="publish" />{publishing ? "检查中…" : "发布到家庭页面"}</button>
+        <button className="button" type="button" onClick={() => void requestSave("manual")} disabled={photoWorkCount > 0 || saveState === "saving" || !dirtyRef.current}><Icon name="save" />保存</button>
+        <button className="button button--primary" type="button" onClick={() => void beginPublish()} disabled={photoWorkCount > 0 || publishing || saveState === "saving"}><Icon name="publish" />{publishing ? "检查中…" : "发布到家庭页面"}</button>
       </div>
     </header>
 
@@ -741,6 +787,7 @@ export default function App() {
       onDeleteCourse={deleteCourse}
       onDeleteTask={deleteTask}
       onError={setNotice}
+      onPhotoWorkChange={changePhotoWorkCount}
     />
 
     {undo && <div className="undo-toast" role="status"><span>已删除“{undo.task.title}” · {undoSeconds} 秒内可撤销</span><button type="button" onClick={undoDelete}>撤销</button></div>}

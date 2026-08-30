@@ -18,6 +18,8 @@ const MIME_EXTENSIONS = new Map([
   ['image/png', 'png'],
   ['image/webp', 'webp'],
 ]);
+const GENERATED_PHOTO_ID_PATTERN = /^photo-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const GENERATED_MEDIA_PATH_PATTERN = /^media\/(full|thumb)\/(photo-[0-9a-f-]+)(-thumb)?\.(jpg|png|webp)$/i;
 
 function multipartError(message, status = 422, details) {
   return new AppError(message, {
@@ -796,6 +798,31 @@ export async function storeMediaUpload({ projectRoot, body, contentType }) {
       mimeType: fullMimeType,
     },
   };
+}
+
+/** Remove only a complete server-generated upload that the client could not attach. */
+export async function discardMediaUpload({ projectRoot, photo }) {
+  if (photo === null || typeof photo !== 'object' || Array.isArray(photo)
+      || typeof photo.id !== 'string' || !GENERATED_PHOTO_ID_PATTERN.test(photo.id)
+      || typeof photo.src !== 'string' || typeof photo.thumbnail !== 'string') {
+    throw multipartError('Uploaded photo reference is invalid.', 400);
+  }
+
+  const fullMatch = GENERATED_MEDIA_PATH_PATTERN.exec(photo.src);
+  const thumbMatch = GENERATED_MEDIA_PATH_PATTERN.exec(photo.thumbnail);
+  if (!fullMatch || fullMatch[1] !== 'full' || fullMatch[2] !== photo.id || fullMatch[3]
+      || !thumbMatch || thumbMatch[1] !== 'thumb' || thumbMatch[2] !== photo.id || thumbMatch[3] !== '-thumb') {
+    throw multipartError('Uploaded photo paths do not match the generated photo ID.', 400);
+  }
+
+  const resolvedRoot = path.resolve(projectRoot);
+  const fullPath = path.join(resolvedRoot, ...photo.src.split('/'));
+  const thumbnailPath = path.join(resolvedRoot, ...photo.thumbnail.split('/'));
+  await Promise.all([
+    rm(fullPath, { force: true }),
+    rm(thumbnailPath, { force: true }),
+  ]);
+  return { discarded: true };
 }
 
 export { detectImageType, inspectImage };

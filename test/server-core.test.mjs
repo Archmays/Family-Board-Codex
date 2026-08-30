@@ -189,6 +189,64 @@ test('HTTP server is loopback-capable, returns revisions, and blocks cross-origi
   const staticPost = await fetch(`${address.url}data/board.json`, { method: 'POST' });
   assert.equal(staticPost.status, 405);
   assert.equal((await staticPost.json()).code, 'method_not_allowed');
+
+  await Promise.all([
+    mkdir(path.join(root, 'media', 'full'), { recursive: true }),
+    mkdir(path.join(root, 'media', 'thumb'), { recursive: true }),
+  ]);
+  const unreferencedPhoto = {
+    id: 'photo-11111111-1111-4111-8111-111111111111',
+    src: 'media/full/photo-11111111-1111-4111-8111-111111111111.png',
+    thumbnail: 'media/thumb/photo-11111111-1111-4111-8111-111111111111-thumb.png',
+  };
+  await Promise.all([
+    writeFile(path.join(root, unreferencedPhoto.src), 'full'),
+    writeFile(path.join(root, unreferencedPhoto.thumbnail), 'thumb'),
+  ]);
+  const discarded = await fetch(`${address.url}api/media/discard`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ photo: unreferencedPhoto }),
+  });
+  assert.equal(discarded.status, 200);
+  assert.equal((await discarded.json()).discarded, true);
+  await assert.rejects(readFile(path.join(root, unreferencedPhoto.src)), { code: 'ENOENT' });
+  await assert.rejects(readFile(path.join(root, unreferencedPhoto.thumbnail)), { code: 'ENOENT' });
+
+  const referencedPhoto = {
+    id: 'photo-22222222-2222-4222-8222-222222222222',
+    src: 'media/full/photo-22222222-2222-4222-8222-222222222222.png',
+    thumbnail: 'media/thumb/photo-22222222-2222-4222-8222-222222222222-thumb.png',
+    caption: '',
+    width: 1,
+    height: 1,
+    mimeType: 'image/png',
+  };
+  await Promise.all([
+    writeFile(path.join(root, referencedPhoto.src), 'full'),
+    writeFile(path.join(root, referencedPhoto.thumbnail), 'thumb'),
+  ]);
+  const boardWithPhoto = structuredClone(snapshot.board);
+  boardWithPhoto.tasks.push({
+    id: 'task-with-photo',
+    title: 'Referenced photo',
+    relatedTo: 'family',
+    dueDate: '2026-09-07',
+    status: 'not_started',
+    completedAt: null,
+    note: '',
+    photos: [referencedPhoto],
+  });
+  await store.save(boardWithPhoto, snapshot.revision);
+  const retained = await fetch(`${address.url}api/media/discard`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ photo: referencedPhoto }),
+  });
+  assert.equal(retained.status, 409);
+  assert.equal((await retained.json()).code, 'media_in_use');
+  assert.equal(await readFile(path.join(root, referencedPhoto.src), 'utf8'), 'full');
+  assert.equal(await readFile(path.join(root, referencedPhoto.thumbnail), 'utf8'), 'thumb');
 });
 
 test('Publisher freezes confirmed bytes, commits only the index, and reloads a later disk edit', async (t) => {
@@ -318,6 +376,7 @@ test('Publisher freezes confirmed bytes, commits only the index, and reloads a l
   assert.deepEqual(result.board, external);
   assert.equal(result.publishedRevision, saved.revision);
   assert.equal(buildInvocation.options.cwd, root);
+  assert.equal(buildInvocation.options.env.NODE_ENV, 'production');
   if (process.platform === 'win32') {
     assert.equal(buildInvocation.command.toLowerCase(), (process.env.ComSpec || 'cmd.exe').toLowerCase());
     assert.deepEqual(buildInvocation.args, ['/d', '/s', '/c', 'npm.cmd', 'run', 'build']);

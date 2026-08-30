@@ -6,7 +6,7 @@ import test from 'node:test';
 import { deflateSync } from 'node:zlib';
 
 import { validateBoard } from '../server/board-schema.mjs';
-import { inspectImage, storeMediaUpload } from '../server/media-upload.mjs';
+import { discardMediaUpload, inspectImage, storeMediaUpload } from '../server/media-upload.mjs';
 
 const JPEG_1X1 = Buffer.from(
   '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAAA//EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AN//Z',
@@ -272,6 +272,32 @@ test('upload verifies actual dimensions, edge limits, and writes only accepted b
       contentType: `multipart/form-data; boundary=${oversizedThumb.boundary}`,
     }),
     (error) => error.status === 422 && error.details?.maxEdge === 600,
+  );
+});
+
+test('discard removes only the exact server-generated upload pair', async (t) => {
+  const projectRoot = await mkdtemp(path.join(tmpdir(), 'family-board-media-discard-'));
+  t.after(async () => {
+    assert.ok(path.basename(projectRoot).startsWith('family-board-media-discard-'));
+    await rm(projectRoot, { recursive: true, force: true });
+  });
+
+  const upload = uploadFor(makePng(), makePng(), 'image/png', 1, 1);
+  const stored = await storeMediaUpload({
+    projectRoot,
+    body: upload.body,
+    contentType: `multipart/form-data; boundary=${upload.boundary}`,
+  });
+  assert.equal((await discardMediaUpload({ projectRoot, photo: stored.photo })).discarded, true);
+  await assert.rejects(readFile(path.join(projectRoot, stored.photo.src)), { code: 'ENOENT' });
+  await assert.rejects(readFile(path.join(projectRoot, stored.photo.thumbnail)), { code: 'ENOENT' });
+
+  await assert.rejects(
+    discardMediaUpload({
+      projectRoot,
+      photo: { ...stored.photo, src: 'media/full/../board.json' },
+    }),
+    (error) => error.status === 400 && error.code === 'invalid_media_upload',
   );
 });
 

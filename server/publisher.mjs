@@ -491,7 +491,10 @@ export class Publisher {
       const npmArgs = isWindows
         ? ['/d', '/s', '/c', 'npm.cmd', 'run', 'build']
         : ['run', 'build'];
-      await this.commandRunner(npmCommand, npmArgs, { cwd: this.projectRoot });
+      await this.commandRunner(npmCommand, npmArgs, {
+        cwd: this.projectRoot,
+        env: { ...process.env, NODE_ENV: 'production' },
+      });
 
       const afterBuild = await this.boardStore.getSnapshotUnlocked();
       if (afterBuild.revision !== baseRevision) {
