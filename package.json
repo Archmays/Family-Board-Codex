@@ -1,0 +1,26 @@
+{
+  "name": "family-board-codex",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "editor": "node server/editor-server.mjs",
+    "build": "node scripts/build-viewer.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test",
+    "validate:data": "node scripts/validate-data.mjs data/board.json",
+    "verify:viewer": "node scripts/verify-viewer.mjs",
+    "qa": "npm run typecheck && npm run test && npm run build && npm run verify:viewer"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.2",
+    "vite": "^7.1.3",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  }
+}

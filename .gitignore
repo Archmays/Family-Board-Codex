@@ -1,6 +1,13 @@
 # Temporary local QA files
 .tmp/
 
+# Local editor runtime
+node_modules/
+data/board.json.bak
+data/publish-state.json
+data/*.tmp
+media/
+
 # Logs
 *.log
 
