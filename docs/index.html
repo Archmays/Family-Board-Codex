@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="黄家日程板：只读查看今日课程、本周课表与近期事项。">
+    <meta name="robots" content="noindex,nofollow,noarchive">
+    <meta name="theme-color" content="#e9e5d9">
+    <title>黄家日程板</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="./assets/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+
+    <header class="site-header">
+      <div class="site-header__inner">
+        <div class="brand-lockup">
+          <p class="brand-lockup__eyebrow">家庭一周安排</p>
+          <h1 id="board-title">黄家日程板</h1>
+        </div>
+
+        <div class="sync-panel" aria-label="数据更新时间">
+          <p>
+            <span class="sync-panel__label">数据最后更新</span>
+            <time id="last-updated" datetime="">正在读取…</time>
+          </p>
+          <button id="refresh-button" class="refresh-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+              <path d="M20 6v5h-5M4 18v-5h5M18.2 9A7 7 0 0 0 6.7 6.4L4 11m16 2-2.7 4.6A7 7 0 0 1 5.8 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>刷新</span>
+          </button>
+        </div>
+      </div>
+
+      <nav class="view-tabs" aria-label="日程板视图">
+        <div class="view-tabs__inner" role="tablist" aria-label="选择要查看的内容">
+          <button id="today-tab" class="view-tab" type="button" role="tab" aria-selected="true" aria-controls="today-panel" tabindex="0" data-view="today">
+            今日
+          </button>
+          <button id="week-tab" class="view-tab" type="button" role="tab" aria-selected="false" aria-controls="week-panel" tabindex="-1" data-view="week">
+            本周课表
+          </button>
+          <button id="tasks-tab" class="view-tab" type="button" role="tab" aria-selected="false" aria-controls="tasks-panel" tabindex="-1" data-view="tasks">
+            近期事项
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="main-content" class="page-shell">
+      <div id="app-status" class="app-status" role="status" aria-live="polite" hidden></div>
+
+      <section id="today-panel" class="view-panel" role="tabpanel" aria-labelledby="today-tab" tabindex="0" data-panel="today">
+        <div class="today-heading">
+          <div class="date-leaf" aria-labelledby="today-date today-weekday">
+            <span class="date-leaf__binding" aria-hidden="true"></span>
+            <p id="today-month" class="date-leaf__month">今天</p>
+            <p id="today-date" class="date-leaf__date">--</p>
+            <p id="today-weekday" class="date-leaf__weekday">正在读取日期</p>
+          </div>
+          <div class="today-heading__copy">
+            <p class="section-kicker">今天先看这里</p>
+            <h2>今天的课程与要紧事项</h2>
+            <p id="today-summary" class="section-intro">正在整理今天的安排。</p>
+          </div>
+        </div>
+
+        <section class="content-section" aria-labelledby="today-courses-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">课程</p>
+              <h3 id="today-courses-title">今天上什么课</h3>
+            </div>
+            <p class="section-note">按时间顺序显示每个人今天的全部课程。</p>
+          </div>
+          <div id="today-schedules" class="children-grid" aria-live="polite">
+            <div class="loading-card">正在读取今天的课程…</div>
+          </div>
+        </section>
+
+        <section class="content-section" aria-labelledby="today-deadlines-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">事项</p>
+              <h3 id="today-deadlines-title">需要留意的截止时间</h3>
+            </div>
+            <p class="section-note">已完成事项不会列入这里。</p>
+          </div>
+          <div class="deadline-grid">
+            <section class="deadline-group deadline-group--overdue" aria-labelledby="overdue-title">
+              <div class="deadline-group__heading">
+                <h4 id="overdue-title">已超期事项</h4>
+                <span id="overdue-count" class="count-marker" aria-label="0 项">0</span>
+              </div>
+              <div id="overdue-tasks" class="compact-task-list">
+                <div class="loading-row">正在读取…</div>
+              </div>
+            </section>
+            <section class="deadline-group deadline-group--today" aria-labelledby="due-today-title">
+              <div class="deadline-group__heading">
+                <h4 id="due-today-title">今天截止事项</h4>
+                <span id="today-due-count" class="count-marker" aria-label="0 项">0</span>
+              </div>
+              <div id="today-due-tasks" class="compact-task-list">
+                <div class="loading-row">正在读取…</div>
+              </div>
+            </section>
+            <section class="deadline-group deadline-group--upcoming" aria-labelledby="upcoming-title">
+              <div class="deadline-group__heading">
+                <h4 id="upcoming-title">最近即将截止</h4>
+                <span id="upcoming-count" class="count-marker" aria-label="0 项">0</span>
+              </div>
+              <div id="upcoming-tasks" class="compact-task-list">
+                <div class="loading-row">正在读取…</div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <section id="week-panel" class="view-panel" role="tabpanel" aria-labelledby="week-tab" tabindex="0" data-panel="week" hidden>
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">星期一至星期日</p>
+            <h2>本周课表</h2>
+            <p class="section-intro">手机上按星期纵向查看，宽屏上对照整周安排。</p>
+          </div>
+          <div class="schedule-filter" role="group" aria-label="按家庭成员筛选课表">
+            <button class="filter-button" type="button" aria-pressed="true" data-child-filter="all">全部</button>
+            <button class="filter-button filter-button--xiaoyue" type="button" aria-pressed="false" data-child-filter="xiaoyue">黄小越</button>
+            <button class="filter-button filter-button--xiaoyi" type="button" aria-pressed="false" data-child-filter="xiaoyi">黄小翊</button>
+          </div>
+        </div>
+        <div id="week-schedule" class="week-grid" aria-live="polite">
+          <div class="loading-card">正在读取本周课表…</div>
+        </div>
+      </section>
+
+      <section id="tasks-panel" class="view-panel" role="tabpanel" aria-labelledby="tasks-tab" tabindex="0" data-panel="tasks" hidden>
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">按截止日期排列</p>
+            <h2>近期事项</h2>
+            <p class="section-intro">未完成事项在前，已完成事项保留在后面供查看。</p>
+          </div>
+          <div class="status-key" aria-label="事项状态说明">
+            <span><i class="status-dot status-dot--not-started" aria-hidden="true"></i>未开始</span>
+            <span><i class="status-dot status-dot--in-progress" aria-hidden="true"></i>进行中</span>
+            <span><i class="status-dot status-dot--completed" aria-hidden="true"></i>已完成</span>
+          </div>
+        </div>
+        <div id="tasks-list" class="task-list" aria-live="polite">
+          <div class="loading-card">正在读取近期事项…</div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>只读日程 · 内容由家庭维护者更新</p>
+    </footer>
+
+    <noscript>
+      <div class="noscript-message">需要启用 JavaScript 才能读取日程数据。</div>
+    </noscript>
+  </body>
+</html>

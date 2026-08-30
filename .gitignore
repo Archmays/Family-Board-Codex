@@ -1,0 +1,10 @@
+# Temporary local QA files
+.tmp/
+
+# Logs
+*.log
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini

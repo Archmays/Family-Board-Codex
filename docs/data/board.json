@@ -1,0 +1,19 @@
+{
+  "meta": {
+    "title": "黄家日程板",
+    "timezone": "Asia/Shanghai",
+    "lastUpdated": "2026-08-30T21:18:54+08:00"
+  },
+  "children": [
+    {
+      "id": "xiaoyue",
+      "name": "黄小越"
+    },
+    {
+      "id": "xiaoyi",
+      "name": "黄小翊"
+    }
+  ],
+  "schedule": [],
+  "tasks": []
+}
