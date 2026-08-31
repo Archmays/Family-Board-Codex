@@ -259,6 +259,11 @@ export function validateBoard(board) {
       }
 
       validateString(errors, course.title, `${path}.title`, { allowEmpty: false, maxLength: 200 });
+      if (course.startDate !== undefined
+          && validateString(errors, course.startDate, `${path}.startDate`, { allowEmpty: false, maxLength: 10 })
+          && !isRealDate(course.startDate)) {
+        pushError(errors, `${path}.startDate`, 'must be a real date in YYYY-MM-DD format', 'format');
+      }
       validateString(errors, course.location, `${path}.location`, { maxLength: 500 });
       validateString(errors, course.note, `${path}.note`, { maxLength: 10_000 });
 

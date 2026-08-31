@@ -118,15 +118,22 @@ export function compareCourses(left: Course, right: Course): number {
   );
 }
 
+export function courseIsActiveOn(course: Course, dateKey: string): boolean {
+  return !course.startDate || course.startDate <= dateKey;
+}
+
 export function coursesForDay(
   board: Board,
   weekday: Weekday,
   childId?: ChildId,
+  dateKey?: string,
 ): Course[] {
   return board.schedule
     .filter(
       (course) =>
-        course.weekday === weekday && (childId === undefined || course.childId === childId),
+        course.weekday === weekday
+        && (childId === undefined || course.childId === childId)
+        && (dateKey === undefined || courseIsActiveOn(course, dateKey)),
     )
     .slice()
     .sort(compareCourses);
@@ -138,7 +145,7 @@ export function getTodayCourseState(
   at = new Date(),
 ): TodayCourseState {
   const now = getZonedNow(board.meta.timezone, at);
-  const courses = coursesForDay(board, now.weekday, childId);
+  const courses = coursesForDay(board, now.weekday, childId, now.dateKey);
   const current =
     courses.find(
       (course) =>

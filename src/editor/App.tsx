@@ -287,6 +287,7 @@ function EditorDrawer(props: DrawerProps) {
               </select>
             </Field>
             <Field label="课程名称" wide><input value={course.title} onChange={(event) => onUpdateCourse({ ...course, title: event.target.value })} /></Field>
+            <Field label="开始生效日期"><input type="date" value={course.startDate ?? ""} onChange={(event) => onUpdateCourse({ ...course, startDate: event.target.value || undefined })} /></Field>
             <Field label="节次/时段"><input value={course.periodLabel ?? ""} onChange={(event) => onUpdateCourse({ ...course, periodLabel: event.target.value || undefined })} placeholder="如 第一节（可留空）" /></Field>
             <Field label="节次顺序"><input type="number" min="1" max="1000" value={course.periodOrder ?? ""} onChange={(event) => onUpdateCourse({ ...course, periodOrder: event.target.value ? Number(event.target.value) : undefined })} placeholder="用于排序" /></Field>
             <Field label="开始时间"><input type="time" value={course.startTime ?? ""} onChange={(event) => onUpdateCourse({ ...course, startTime: event.target.value || undefined })} /></Field>

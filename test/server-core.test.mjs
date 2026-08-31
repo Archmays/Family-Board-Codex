@@ -79,6 +79,28 @@ test('schema accepts period-only courses and rejects incomplete schedule coordin
   assert.ok(result.errors.some((error) => error.path === 'schedule[0]'));
 });
 
+test('schema accepts optional course start dates and rejects impossible dates', () => {
+  const board = makeBoard();
+  board.schedule.push({
+    id: 'course-with-start-date',
+    childId: 'xiaoyue',
+    weekday: 1,
+    title: '足球俱乐部',
+    startDate: '2026-09-07',
+    periodLabel: '第六至第七节',
+    periodOrder: 90,
+    location: '',
+    note: '',
+    photos: [],
+  });
+  assert.equal(validateBoard(board).ok, true);
+
+  board.schedule[0].startDate = '2026-09-31';
+  const result = validateBoard(board);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.path === 'schedule[0].startDate'));
+});
+
 test('BoardStore serializes saves, timestamps them, keeps one backup, and rejects stale revisions', async (t) => {
   const root = await makeProject(t);
   const store = new BoardStore({ projectRoot: root });

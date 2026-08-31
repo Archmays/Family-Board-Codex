@@ -136,6 +136,9 @@ function CourseDetails({ board, course }: { board: Board; course: Course }) {
     <DetailRows>
       <DetailRow label="孩子">{childName(board, course.childId)}</DetailRow>
       <DetailRow label="星期">{WEEKDAY_LABELS[course.weekday]}</DetailRow>
+      {course.startDate ? (
+        <DetailRow label="开始日期">{formatDateKey(course.startDate, { weekday: true })}</DetailRow>
+      ) : null}
       <DetailRow label={course.periodLabel ? "节次" : "时间"}>{formatCourseSchedule(course)}</DetailRow>
       {course.periodLabel && course.startTime && course.endTime ? (
         <DetailRow label="时间">{course.startTime}–{course.endTime}</DetailRow>

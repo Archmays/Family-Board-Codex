@@ -34,6 +34,7 @@ export interface Course {
   childId: ChildId;
   weekday: Weekday;
   title: string;
+  startDate?: string;
   periodLabel?: string;
   periodOrder?: number;
   startTime?: string;

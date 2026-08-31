@@ -11,6 +11,7 @@ import {
   WEEKDAY_LABELS,
   childName,
   compareCourses,
+  courseIsActiveOn,
   courseHasExactTime,
   currentWeekDateKeys,
   formatDateKey,
@@ -375,7 +376,9 @@ function WeekView({
       <div className="fb-week-grid">
         {weekDates.map((dateKey, index) => {
           const weekday = (index + 1) as Weekday;
-          const courses = schedule.filter((course) => course.weekday === weekday);
+          const courses = schedule.filter(
+            (course) => course.weekday === weekday && courseIsActiveOn(course, dateKey),
+          );
           const today = weekday === now.weekday;
           return (
             <section key={weekday} className={`fb-day-column${today ? " fb-day-column--today" : ""}`}>
