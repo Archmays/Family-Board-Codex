@@ -122,7 +122,7 @@ function makeBoard() {
   return {
     schemaVersion: 1,
     meta: {
-      title: '黄家日程板',
+      title: '家庭日程板',
       timezone: 'Asia/Shanghai',
       lastUpdated: '2026-08-30T22:00:00+08:00',
     },

@@ -742,7 +742,7 @@ export default function App() {
     <header className="editor-commandbar">
       <div className="editor-commandbar__identity">
         <span className="local-mark">LOCAL</span>
-        <div><strong>黄家日程板</strong><span>本地编辑器 · 仅 127.0.0.1</span></div>
+        <div><strong>家庭日程板</strong><span>本地编辑器 · 仅 127.0.0.1</span></div>
       </div>
       <div className="save-ledger" aria-live="polite">
         <span className={`state-pill state-pill--${saveState}`}>{saveLabel}</span>

@@ -234,7 +234,7 @@ export function ViewerApp() {
     window.setTimeout(() => lastFocus.current?.focus(), 0);
   };
 
-  const title = board?.meta.title || "黄家日程板";
+  const title = board?.meta.title || "家庭日程板";
 
   return (
     <div className="fb-viewer-shell">

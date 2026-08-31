@@ -19,7 +19,7 @@ const WEBP_1X1 = Buffer.from(
 const validBoard = {
   schemaVersion: 1,
   meta: {
-    title: "黄家日程板",
+    title: "家庭日程板",
     timezone: "Asia/Shanghai",
     lastUpdated: "2026-08-30T21:18:54+08:00",
   },
