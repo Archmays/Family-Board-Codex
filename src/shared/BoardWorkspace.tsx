@@ -11,8 +11,10 @@ import {
   WEEKDAY_LABELS,
   childName,
   compareCourses,
+  courseHasExactTime,
   currentWeekDateKeys,
   formatDateKey,
+  formatCourseSchedule,
   getTaskBuckets,
   getTodayCourseState,
   getZonedNow,
@@ -117,7 +119,7 @@ function CourseCard({
       onClick={onSelect ? () => onSelect(course) : undefined}
     >
       <span className="fb-course-card__time">
-        {course.startTime}–{course.endTime}
+        {formatCourseSchedule(course)}
       </span>
       <span className="fb-course-card__title">{course.title}</span>
       <span className="fb-course-card__person">{childName(board, course.childId)}</span>
@@ -207,7 +209,7 @@ function TodayView({
           <p className="fb-kicker">今天先看这里</p>
           <h2>今天的节奏，一眼看清</h2>
           <p>
-            {courseCount > 0 ? `今天有 ${courseCount} 节课` : "今天没有课程"}；
+            {courseCount > 0 ? `今天有 ${courseCount} 项课程安排` : "今天没有课程"}；
             {urgentCount > 0 ? `${urgentCount} 项已经到期或超期。` : "没有到期事项。"}
           </p>
         </div>
@@ -219,7 +221,7 @@ function TodayView({
             <p className="fb-kicker">课程</p>
             <h3 id="fb-today-course-title">两个人今天怎么安排</h3>
           </div>
-          <p>当前、下一节与全天课程按时间排列。</p>
+          <p>有钟点的课程显示当前与下一节；其余安排按节次排列。</p>
         </div>
         <div className="fb-child-lanes">
           {CHILD_IDS.map((childId) => {
@@ -228,24 +230,33 @@ function TodayView({
               <section key={childId} className={`fb-child-lane fb-child-lane--${childId}`}>
                 <header className="fb-child-lane__header">
                   <h4>{childName(board, childId)}</h4>
-                  <span>{state.courses.length} 节课</span>
+                  <span>{state.courses.length} 项</span>
                 </header>
-                <div className="fb-course-focus-grid">
-                  <div className="fb-course-focus fb-course-focus--current">
-                    <span>正在进行</span>
-                    <strong>
-                      {state.current
-                        ? `${state.current.startTime} · ${state.current.title}`
-                        : "当前没有课程"}
-                    </strong>
+                {state.courses.some(courseHasExactTime) ? (
+                  <div className="fb-course-focus-grid">
+                    <div className="fb-course-focus fb-course-focus--current">
+                      <span>正在进行</span>
+                      <strong>
+                        {state.current
+                          ? `${state.current.startTime} · ${state.current.title}`
+                          : "当前没有课程"}
+                      </strong>
+                    </div>
+                    <div className="fb-course-focus fb-course-focus--next">
+                      <span>下一节</span>
+                      <strong>
+                        {state.next ? `${state.next.startTime} · ${state.next.title}` : "今天没有下一节"}
+                      </strong>
+                    </div>
                   </div>
-                  <div className="fb-course-focus fb-course-focus--next">
-                    <span>下一节</span>
-                    <strong>
-                      {state.next ? `${state.next.startTime} · ${state.next.title}` : "今天没有下一节"}
-                    </strong>
+                ) : state.courses.length > 0 ? (
+                  <div className="fb-course-focus-grid">
+                    <div className="fb-course-focus">
+                      <span>今日课表</span>
+                      <strong>未提供具体钟点，请按下方节次查看</strong>
+                    </div>
                   </div>
-                </div>
+                ) : null}
                 <div className="fb-course-stack">
                   {state.courses.length > 0 ? (
                     state.courses.map((course) => (

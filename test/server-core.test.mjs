@@ -57,6 +57,28 @@ test('schema enforces completedAt consistency and complete photo fields', () => 
   assert.ok(result.errors.some((error) => error.path === 'tasks[0].completedAt'));
 });
 
+test('schema accepts period-only courses and rejects incomplete schedule coordinates', () => {
+  const board = makeBoard();
+  board.schedule.push({
+    id: 'course-period-only',
+    childId: 'xiaoyue',
+    weekday: 1,
+    title: '语文',
+    periodLabel: '第一节',
+    periodOrder: 20,
+    location: '',
+    note: '',
+    photos: [],
+  });
+  assert.equal(validateBoard(board).ok, true);
+
+  const incomplete = structuredClone(board);
+  incomplete.schedule[0].startTime = '08:00';
+  const result = validateBoard(incomplete);
+  assert.equal(result.ok, false);
+  assert.ok(result.errors.some((error) => error.path === 'schedule[0]'));
+});
+
 test('BoardStore serializes saves, timestamps them, keeps one backup, and rejects stale revisions', async (t) => {
   const root = await makeProject(t);
   const store = new BoardStore({ projectRoot: root });

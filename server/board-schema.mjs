@@ -262,16 +262,37 @@ export function validateBoard(board) {
       validateString(errors, course.location, `${path}.location`, { maxLength: 500 });
       validateString(errors, course.note, `${path}.note`, { maxLength: 10_000 });
 
+      const hasPeriodLabel = course.periodLabel !== undefined;
+      const hasPeriodOrder = course.periodOrder !== undefined;
+      if (hasPeriodLabel) {
+        validateString(errors, course.periodLabel, `${path}.periodLabel`, { allowEmpty: false, maxLength: 100 });
+      }
+      if (hasPeriodOrder
+          && (!Number.isInteger(course.periodOrder) || course.periodOrder < 1 || course.periodOrder > 1_000)) {
+        pushError(errors, `${path}.periodOrder`, 'must be an integer from 1 to 1000', 'range');
+      }
+      if (hasPeriodLabel !== hasPeriodOrder) {
+        pushError(errors, path, 'periodLabel and periodOrder must be provided together', 'consistency');
+      }
+
+      const hasStartTime = course.startTime !== undefined && course.startTime !== '';
+      const hasEndTime = course.endTime !== undefined && course.endTime !== '';
       const startMinutes = timeToMinutes(course.startTime);
       const endMinutes = timeToMinutes(course.endTime);
-      if (startMinutes === null) {
+      if (hasStartTime && startMinutes === null) {
         pushError(errors, `${path}.startTime`, 'must use valid 24-hour HH:MM format', 'format');
       }
-      if (endMinutes === null) {
+      if (hasEndTime && endMinutes === null) {
         pushError(errors, `${path}.endTime`, 'must use valid 24-hour HH:MM format', 'format');
       }
-      if (startMinutes !== null && endMinutes !== null && endMinutes <= startMinutes) {
+      if (hasStartTime !== hasEndTime) {
+        pushError(errors, path, 'startTime and endTime must be provided together', 'consistency');
+      }
+      if (hasStartTime && hasEndTime && startMinutes !== null && endMinutes !== null && endMinutes <= startMinutes) {
         pushError(errors, `${path}.endTime`, 'must be later than startTime', 'range');
+      }
+      if (!hasPeriodLabel && !hasStartTime && !hasEndTime) {
+        pushError(errors, path, 'must include either a period label or an exact time range', 'required');
       }
 
       validatePhotos(errors, course.photos, `${path}.photos`, seenPhotoIds);

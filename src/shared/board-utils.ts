@@ -85,14 +85,33 @@ export function getZonedNow(timeZone: string, at = new Date()): ZonedNow {
   };
 }
 
-export function timeToMinutes(value: string): number {
-  const match = /^(\d{2}):(\d{2})$/.exec(value);
+export function timeToMinutes(value: string | undefined): number {
+  const match = /^(\d{2}):(\d{2})$/.exec(value ?? "");
   if (!match) return Number.POSITIVE_INFINITY;
   return Number(match[1]) * 60 + Number(match[2]);
 }
 
+export function courseHasExactTime(course: Course): boolean {
+  return Number.isFinite(timeToMinutes(course.startTime))
+    && Number.isFinite(timeToMinutes(course.endTime));
+}
+
+export function formatCourseSchedule(course: Course): string {
+  const periodLabel = course.periodLabel?.trim();
+  if (periodLabel) return periodLabel;
+  if (courseHasExactTime(course)) return `${course.startTime}–${course.endTime}`;
+  return "节次未注明";
+}
+
 export function compareCourses(left: Course, right: Course): number {
+  const leftPeriodOrder = Number.isInteger(left.periodOrder)
+    ? Number(left.periodOrder)
+    : Number.POSITIVE_INFINITY;
+  const rightPeriodOrder = Number.isInteger(right.periodOrder)
+    ? Number(right.periodOrder)
+    : Number.POSITIVE_INFINITY;
   return (
+    leftPeriodOrder - rightPeriodOrder ||
     timeToMinutes(left.startTime) - timeToMinutes(right.startTime) ||
     timeToMinutes(left.endTime) - timeToMinutes(right.endTime) ||
     left.title.localeCompare(right.title, "zh-CN")
@@ -123,10 +142,13 @@ export function getTodayCourseState(
   const current =
     courses.find(
       (course) =>
+        courseHasExactTime(course) &&
         timeToMinutes(course.startTime) <= now.minutes &&
         now.minutes < timeToMinutes(course.endTime),
     ) ?? null;
-  const next = courses.find((course) => timeToMinutes(course.startTime) > now.minutes) ?? null;
+  const next = courses.find(
+    (course) => courseHasExactTime(course) && timeToMinutes(course.startTime) > now.minutes,
+  ) ?? null;
   return { courses, current, next };
 }
 

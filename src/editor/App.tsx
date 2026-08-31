@@ -287,8 +287,10 @@ function EditorDrawer(props: DrawerProps) {
               </select>
             </Field>
             <Field label="课程名称" wide><input value={course.title} onChange={(event) => onUpdateCourse({ ...course, title: event.target.value })} /></Field>
-            <Field label="开始时间"><input type="time" value={course.startTime} onChange={(event) => onUpdateCourse({ ...course, startTime: event.target.value })} /></Field>
-            <Field label="结束时间"><input type="time" value={course.endTime} onChange={(event) => onUpdateCourse({ ...course, endTime: event.target.value })} /></Field>
+            <Field label="节次/时段"><input value={course.periodLabel ?? ""} onChange={(event) => onUpdateCourse({ ...course, periodLabel: event.target.value || undefined })} placeholder="如 第一节（可留空）" /></Field>
+            <Field label="节次顺序"><input type="number" min="1" max="1000" value={course.periodOrder ?? ""} onChange={(event) => onUpdateCourse({ ...course, periodOrder: event.target.value ? Number(event.target.value) : undefined })} placeholder="用于排序" /></Field>
+            <Field label="开始时间"><input type="time" value={course.startTime ?? ""} onChange={(event) => onUpdateCourse({ ...course, startTime: event.target.value || undefined })} /></Field>
+            <Field label="结束时间"><input type="time" value={course.endTime ?? ""} onChange={(event) => onUpdateCourse({ ...course, endTime: event.target.value || undefined })} /></Field>
             <Field label="地点" wide><input value={course.location} onChange={(event) => onUpdateCourse({ ...course, location: event.target.value })} placeholder="可留空" /></Field>
             <Field label="备注" wide><textarea rows={4} value={course.note} onChange={(event) => onUpdateCourse({ ...course, note: event.target.value })} placeholder="可留空" /></Field>
           </div>
@@ -590,7 +592,7 @@ export default function App() {
   const addCourse = () => {
     const course: Course = {
       id: makeId("course"), childId: "xiaoyue", weekday: shanghaiWeekday() as Course["weekday"], title: "新课程",
-      startTime: "09:00", endTime: "10:00", location: "", note: "", photos: [],
+      periodLabel: "第一节", periodOrder: 20, location: "", note: "", photos: [],
     };
     mutateBoard((draft) => { draft.schedule.push(course); });
     setView("week");

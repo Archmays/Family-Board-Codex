@@ -3,7 +3,7 @@
   "meta": {
     "title": "家庭日程板",
     "timezone": "Asia/Shanghai",
-    "lastUpdated": "2026-08-30T23:09:57.698+08:00"
+    "lastUpdated": "2026-08-31T14:38:49.205+08:00"
   },
   "children": [
     {
@@ -15,6 +15,535 @@
       "name": "黄小翊"
     }
   ],
-  "schedule": [],
+  "schedule": [
+    {
+      "id": "xiaoyue-mon-morning",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "升旗仪式",
+      "periodLabel": "晨曦时光",
+      "periodOrder": 10,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-p1",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "UOI-语文",
+      "periodLabel": "第一节",
+      "periodOrder": 20,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-p2",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "英语（外教）",
+      "periodLabel": "第二节",
+      "periodOrder": 30,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-p3",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "UOI-数学",
+      "periodLabel": "第三节",
+      "periodOrder": 40,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-p4",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "英语",
+      "periodLabel": "第四节",
+      "periodOrder": 50,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-lunch",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "午餐+户外活动",
+      "periodLabel": "中午",
+      "periodOrder": 60,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-rest",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "午间时光",
+      "periodLabel": "中午",
+      "periodOrder": 70,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-p5",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "道法/心理",
+      "periodLabel": "第五节",
+      "periodOrder": 80,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-mon-p6-p7",
+      "childId": "xiaoyue",
+      "weekday": 1,
+      "title": "俱乐部-足球",
+      "periodLabel": "第六至第七节",
+      "periodOrder": 90,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-morning",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "English Space",
+      "periodLabel": "晨曦时光",
+      "periodOrder": 10,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p1",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "语文",
+      "periodLabel": "第一节",
+      "periodOrder": 20,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p2",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "语文",
+      "periodLabel": "第二节",
+      "periodOrder": 30,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p3",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "Global Inquiry",
+      "periodLabel": "第三节",
+      "periodOrder": 40,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p4",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "体育",
+      "periodLabel": "第四节",
+      "periodOrder": 50,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-lunch",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "午餐+户外活动",
+      "periodLabel": "中午",
+      "periodOrder": 60,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-rest",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "午间时光",
+      "periodLabel": "中午",
+      "periodOrder": 70,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p5",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "财商",
+      "periodLabel": "第五节",
+      "periodOrder": 80,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p6",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "UOI",
+      "periodLabel": "第六节",
+      "periodOrder": 90,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-tue-p7",
+      "childId": "xiaoyue",
+      "weekday": 2,
+      "title": "UOI",
+      "periodLabel": "第七节",
+      "periodOrder": 100,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-morning",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "经典诵读",
+      "periodLabel": "晨曦时光",
+      "periodOrder": 10,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-p1",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "语文",
+      "periodLabel": "第一节",
+      "periodOrder": 20,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-p2",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "数学",
+      "periodLabel": "第二节",
+      "periodOrder": 30,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-p3",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "体育（外教）",
+      "periodLabel": "第三节",
+      "periodOrder": 40,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-p4",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "UOI-科学",
+      "periodLabel": "第四节",
+      "periodOrder": 50,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-lunch",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "午餐+户外活动",
+      "periodLabel": "中午",
+      "periodOrder": 60,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-rest",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "午间时光",
+      "periodLabel": "中午",
+      "periodOrder": 70,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-p5",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "UOI-英语",
+      "periodLabel": "第五节",
+      "periodOrder": 80,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-wed-p6-p7",
+      "childId": "xiaoyue",
+      "weekday": 3,
+      "title": "俱乐部-服装设计",
+      "periodLabel": "第六至第七节",
+      "periodOrder": 90,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-morning",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "口算旅行家",
+      "periodLabel": "晨曦时光",
+      "periodOrder": 10,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p1",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "数学",
+      "periodLabel": "第一节",
+      "periodOrder": 20,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p2",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "UOI-语文",
+      "periodLabel": "第二节",
+      "periodOrder": 30,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p3",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "体育",
+      "periodLabel": "第三节",
+      "periodOrder": 40,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p4",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "英语（外教）",
+      "periodLabel": "第四节",
+      "periodOrder": 50,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-lunch",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "午餐+户外活动",
+      "periodLabel": "中午",
+      "periodOrder": 60,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-rest",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "午间时光",
+      "periodLabel": "中午",
+      "periodOrder": 70,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p5",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "英语",
+      "periodLabel": "第五节",
+      "periodOrder": 80,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p6",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "思辨",
+      "periodLabel": "第六节",
+      "periodOrder": 90,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-thu-p7",
+      "childId": "xiaoyue",
+      "weekday": 4,
+      "title": "戏剧",
+      "periodLabel": "第七节",
+      "periodOrder": 100,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-morning",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "童眼看世界",
+      "periodLabel": "晨曦时光",
+      "periodOrder": 10,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p1",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "UOI-数学",
+      "periodLabel": "第一节",
+      "periodOrder": 20,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p2",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "语文",
+      "periodLabel": "第二节",
+      "periodOrder": 30,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p3",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "美术",
+      "periodLabel": "第三节",
+      "periodOrder": 40,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p4",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "美术",
+      "periodLabel": "第四节",
+      "periodOrder": 50,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-lunch",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "午餐+户外活动",
+      "periodLabel": "中午",
+      "periodOrder": 60,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-rest",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "午间时光",
+      "periodLabel": "中午",
+      "periodOrder": 70,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p5",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "UOI-iQuest",
+      "periodLabel": "第五节",
+      "periodOrder": 80,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p6",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "音乐",
+      "periodLabel": "第六节",
+      "periodOrder": 90,
+      "location": "",
+      "note": "",
+      "photos": []
+    },
+    {
+      "id": "xiaoyue-fri-p7",
+      "childId": "xiaoyue",
+      "weekday": 5,
+      "title": "音乐",
+      "periodLabel": "第七节",
+      "periodOrder": 100,
+      "location": "",
+      "note": "",
+      "photos": []
+    }
+  ],
   "tasks": []
 }

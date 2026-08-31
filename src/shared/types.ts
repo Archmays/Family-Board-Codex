@@ -34,8 +34,10 @@ export interface Course {
   childId: ChildId;
   weekday: Weekday;
   title: string;
-  startTime: string;
-  endTime: string;
+  periodLabel?: string;
+  periodOrder?: number;
+  startTime?: string;
+  endTime?: string;
   location: string;
   note: string;
   photos: PhotoAttachment[];

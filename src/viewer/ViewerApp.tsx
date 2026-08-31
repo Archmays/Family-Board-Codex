@@ -4,6 +4,7 @@ import {
   TASK_STATUS_LABELS,
   WEEKDAY_LABELS,
   childName,
+  formatCourseSchedule,
   formatDateKey,
   formatTimestamp,
   relatedName,
@@ -135,7 +136,10 @@ function CourseDetails({ board, course }: { board: Board; course: Course }) {
     <DetailRows>
       <DetailRow label="孩子">{childName(board, course.childId)}</DetailRow>
       <DetailRow label="星期">{WEEKDAY_LABELS[course.weekday]}</DetailRow>
-      <DetailRow label="时间">{course.startTime}–{course.endTime}</DetailRow>
+      <DetailRow label={course.periodLabel ? "节次" : "时间"}>{formatCourseSchedule(course)}</DetailRow>
+      {course.periodLabel && course.startTime && course.endTime ? (
+        <DetailRow label="时间">{course.startTime}–{course.endTime}</DetailRow>
+      ) : null}
       <DetailRow label="地点">{course.location || "未填写"}</DetailRow>
       <DetailRow label="备注">{course.note || "没有备注"}</DetailRow>
     </DetailRows>
