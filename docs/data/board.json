@@ -3,7 +3,7 @@
   "meta": {
     "title": "家庭日程板",
     "timezone": "Asia/Shanghai",
-    "lastUpdated": "2026-08-31T20:48:27.890+08:00"
+    "lastUpdated": "2026-09-02T19:01:16.001+08:00"
   },
   "children": [
     {
@@ -547,46 +547,5 @@
       "photos": []
     }
   ],
-  "tasks": [
-    {
-      "id": "xiaoyue-after-school-form-prepare-2026-09-02",
-      "title": "打印并填写《武汉英中晚托服务说明》",
-      "relatedTo": "xiaoyue",
-      "dueDate": "2026-09-02",
-      "status": "not_started",
-      "completedAt": null,
-      "note": "9月2日前打印并填写完毕，保留完整纸质文件。",
-      "photos": []
-    },
-    {
-      "id": "xiaoyue-after-school-form-submit-2026-09-03",
-      "title": "将《武汉英中晚托服务说明》交给班主任",
-      "relatedTo": "xiaoyue",
-      "dueDate": "2026-09-03",
-      "status": "not_started",
-      "completedAt": null,
-      "note": "由黄小越携带完整纸质文件到学校，交给班主任。",
-      "photos": []
-    },
-    {
-      "id": "xiaoyue-art-materials-2026-09-04",
-      "title": "准备一年级美术材料",
-      "relatedTo": "xiaoyue",
-      "dueDate": "2026-09-04",
-      "status": "not_started",
-      "completedAt": null,
-      "note": "依据《一年级美术材料清单》整理好，并带到学校。",
-      "photos": []
-    },
-    {
-      "id": "xiaoyue-fashion-materials-2026-09-04",
-      "title": "准备服装设计俱乐部材料",
-      "relatedTo": "xiaoyue",
-      "dueDate": "2026-09-04",
-      "status": "not_started",
-      "completedAt": null,
-      "note": "依据《服装设计俱乐部材料》准备，全部放入定制帆布袋。",
-      "photos": []
-    }
-  ]
+  "tasks": []
 }
