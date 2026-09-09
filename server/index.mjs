@@ -62,9 +62,14 @@ function boardReferencesUploadedMedia(board, photo) {
 function openBrowser(url) {
   let command;
   let args;
+  let windowsVerbatimArguments = false;
   if (process.platform === 'win32') {
     command = 'cmd.exe';
-    args = ['/d', '/s', '/c', 'start', '""', `"${url}"`];
+    // cmd.exe's `start` has its own quoting rules. Passing the quoted pieces as
+    // separate spawn arguments causes Node to quote them a second time, turning
+    // the URL into an invalid file path. Send one verbatim command line instead.
+    args = [`/d /s /c start "" "${url}"`];
+    windowsVerbatimArguments = true;
   } else if (process.platform === 'darwin') {
     command = 'open';
     args = [url];
@@ -77,6 +82,7 @@ function openBrowser(url) {
     const child = spawn(command, args, {
       detached: true,
       windowsHide: true,
+      windowsVerbatimArguments,
       stdio: 'ignore',
     });
     child.unref();
@@ -289,7 +295,7 @@ export async function createFamilyBoardServer({
     listeningPort = typeof address === 'object' && address ? address.port : port;
     const url = `http://127.0.0.1:${listeningPort}/`;
     if (autoOpen && process.env.FAMILY_BOARD_NO_OPEN !== '1') {
-      openBrowser(url);
+      openBrowser(`${url}editor.html`);
     }
     return { host: '127.0.0.1', port: listeningPort, url };
   }
