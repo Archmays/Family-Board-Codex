@@ -48,6 +48,7 @@ export interface PublishResponse {
   needsPublish: boolean;
   published: boolean;
   pushed: boolean;
+  deploymentStatus: "unverified";
   committed: boolean;
   commitSha: string;
   pagesUrl: string;

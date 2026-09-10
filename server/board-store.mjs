@@ -22,6 +22,8 @@ function serializeBoard(board) {
 }
 
 function serializePublishState(publishedRevision, publishedBoard) {
+  // Version-1 names are retained for compatibility. This is the pushed snapshot
+  // (or legacy local docs baseline), never evidence that Pages serves it.
   return `${JSON.stringify({
     schemaVersion: 1,
     publishedRevision,

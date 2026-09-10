@@ -483,7 +483,8 @@ export class Publisher {
       }
 
       // Freeze the legacy docs-derived value before the build replaces docs/.
-      // From this point on, only a successful push may advance publishedRevision.
+      // Legacy field name: publishedRevision records the last pushed snapshot,
+      // not a verified Pages deployment. Only a successful push may advance it.
       await this.boardStore.ensurePublishState(publishedSnapshot);
 
       const isWindows = process.platform === 'win32';
@@ -598,8 +599,9 @@ export class Publisher {
         summary: preflight.summary,
         committed,
         commitSha,
-        published: true,
+        published: false,
         pushed: true,
+        deploymentStatus: 'unverified',
         pagesUrl: this.pagesUrl,
         pushOutput: `${pushResult.stdout.toString('utf8')}${pushResult.stderr.toString('utf8')}`.trim(),
       };

@@ -347,7 +347,7 @@ function PublishDialog({ plan, busy, onCancel, onConfirm }: { plan: PublishPrefl
     <section className="publish-dialog" role="dialog" aria-modal="true" aria-labelledby="publish-dialog-title">
       <p className="dialog-eyebrow">发布前检查</p>
       <h2 id="publish-dialog-title">把当前快照发布到家庭页面？</h2>
-      <p>本地保存与公开发布是两件事。确认后将构建只读页面、提交并推送到 GitHub Pages。</p>
+      <p>确认后将构建只读页面、提交并推送到 GitHub。线上页面何时生效需等待部署并另行确认。</p>
       <div className="publish-summary">
         {groups.map(([label, counts]) => <div key={label}>
           <strong>{label}</strong>
@@ -355,7 +355,7 @@ function PublishDialog({ plan, busy, onCancel, onConfirm }: { plan: PublishPrefl
         </div>)}
         <div><strong>照片</strong><span>新增 {plan.summary.photos.added}</span><span>移除 {plan.summary.photos.removed}</span></div>
       </div>
-      {!plan.needsPublish && <p className="dialog-note">本地内容与已发布版本一致；仍会检查构建和远端同步状态。</p>}
+      {!plan.needsPublish && <p className="dialog-note">本地内容与记录的发布快照一致；线上是否已生效尚未确认，仍会检查构建和远端同步状态。</p>}
       <div className="dialog-actions">
         <button ref={cancelRef} className="button" type="button" onClick={onCancel} disabled={busy}>取消</button>
         <button className="button button--primary" type="button" onClick={onConfirm} disabled={busy}><Icon name="publish" />{busy ? "正在发布…" : "确认发布"}</button>
@@ -546,11 +546,11 @@ export default function App() {
   }, [undo]);
 
   const hasUnsavedDraft = photoWorkCount > 0 || saveState === "dirty" || saveState === "saving" || saveState === "failed";
-  const isPublished = !hasUnsavedDraft && Boolean(revision && revision === publishedRevision);
+  const matchesPublishSnapshot = !hasUnsavedDraft && Boolean(revision && revision === publishedRevision);
   const saveLabel = photoWorkCount > 0 ? "正在处理照片" : SAVE_LABELS[saveState];
   const publicationLabel = hasUnsavedDraft
-    ? "当前修改尚未发布"
-    : isPublished ? "已发布" : "本地已保存、尚未发布";
+    ? "当前修改尚未推送"
+    : matchesPublishSnapshot ? "发布快照一致 · 线上待确认" : "本地已保存、尚未推送";
 
   const updateCourse = useCallback((course: Course) => {
     mutateBoard((draft) => {
@@ -692,7 +692,7 @@ export default function App() {
     setPublishing(true);
     try {
       const result = await publishBoard(confirmedPlan.revision, confirmedPlan.preflightToken);
-      if (!result.published) throw new Error("Git push 未成功，公开页面尚未更新");
+      if (!result.pushed) throw new Error("Git push 未成功，线上页面状态尚未确认");
       publishedRevisionRef.current = result.publishedRevision;
       setPublishedRevision(result.publishedRevision);
       setPublishPlan(null);
@@ -705,9 +705,9 @@ export default function App() {
             revision: result.revision,
             publishedRevision: result.publishedRevision,
           });
-          setNotice(`已发布确认时的版本（提交 ${result.commitSha.slice(0, 8)}）；发布期间浏览器和磁盘内容都发生了变化，本地草稿已保留，请先处理版本冲突。`);
+          setNotice(`已推送确认时的版本（提交 ${result.commitSha.slice(0, 8)}），线上待确认；推送期间浏览器和磁盘内容都发生了变化，本地草稿已保留，请先处理版本冲突。`);
         } else {
-          setNotice(`已发布确认时的版本（提交 ${result.commitSha.slice(0, 8)}）；发布期间新增的本地修改已保留，尚未保存或发布。`);
+          setNotice(`已推送确认时的版本（提交 ${result.commitSha.slice(0, 8)}），线上待确认；推送期间新增的本地修改已保留，尚未保存或推送。`);
         }
         if (dirtyRef.current) setSaveState("dirty");
       } else {
@@ -718,8 +718,8 @@ export default function App() {
         setSaveState("saved");
         setDrawer(null);
         setNotice(result.needsPublish
-          ? `已发布确认时的版本（提交 ${result.commitSha.slice(0, 8)}）；同时载入了磁盘上的更新内容，该内容尚未发布。`
-          : `已发布到家庭页面。提交 ${result.commitSha.slice(0, 8)}。`);
+          ? `已推送确认时的版本（提交 ${result.commitSha.slice(0, 8)}），线上待确认；同时载入了磁盘上的更新内容，该内容尚未推送。`
+          : `已推送到 GitHub（提交 ${result.commitSha.slice(0, 8)}）。线上页面是否生效尚未确认，请等待部署后查看家庭页面。`);
       }
     } catch (error) {
       setNotice(`发布失败：${messageFromError(error)}`);
@@ -749,7 +749,7 @@ export default function App() {
       </div>
       <div className="save-ledger" aria-live="polite">
         <span className={`state-pill state-pill--${saveState}`}>{saveLabel}</span>
-        <span className={`state-pill ${isPublished ? "state-pill--published" : "state-pill--unpublished"}`}>{publicationLabel}</span>
+        <span className={`state-pill ${matchesPublishSnapshot ? "state-pill--published" : "state-pill--unpublished"}`}>{publicationLabel}</span>
       </div>
       <div className="editor-commandbar__actions">
         <button className="button" type="button" onClick={openPreview}><Icon name="preview" />只读预览</button>

@@ -414,8 +414,9 @@ test('Publisher freezes confirmed bytes, commits only the index, and reloads a l
   await rm(unrelatedPath, { force: true });
   const confirmedPreflight = await publisher.preflight(saved.revision);
   const result = await publisher.publish(saved.revision, confirmedPreflight.preflightToken);
-  assert.equal(result.published, true);
+  assert.equal(result.published, false);
   assert.equal(result.pushed, true);
+  assert.equal(result.deploymentStatus, 'unverified');
   assert.equal(result.needsPublish, true);
   assert.deepEqual(result.board, external);
   assert.equal(result.publishedRevision, saved.revision);
@@ -526,8 +527,9 @@ test('failed push preserves the last successful revision across reload and can b
   assert.equal(retryPlan.summary.tasks.modified, 0);
   assert.equal(retryPlan.summary.tasks.deleted, 0);
   const retried = await retryPublisher.publish(saved.revision, retryPlan.preflightToken);
-  assert.equal(retried.published, true);
+  assert.equal(retried.published, false);
   assert.equal(retried.pushed, true);
+  assert.equal(retried.deploymentStatus, 'unverified');
   assert.equal(retried.committed, false);
   assert.equal(retried.publishedRevision, saved.revision);
   assert.equal(retried.needsPublish, false);

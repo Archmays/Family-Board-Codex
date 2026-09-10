@@ -33,6 +33,8 @@ npm run editor
 
 保存使用 `baseRevision` 防止覆盖 Codex 或其他程序刚写入的磁盘版本。点击“发布到家庭页面”后，编辑器会先保存、显示变更摘要并等待确认，然后构建只读 Viewer 到 `docs/`、复制被引用的媒体、提交并推送 `main`。发现与日程/发布物无关的未提交改动时，UI 会停止发布并提示交给 Codex 处理。
 
+推送成功只确认 GitHub 已收到提交。编辑器显示“线上待确认”，不会据此声明家庭页面已生效；须等 Pages 部署后再查看页面。为兼容已有本地记录，`publishedRevision` / `publishedBoard` 字段名保留，表示推送快照（旧记录回退时可能仅为本地 docs 基线），不是线上部署凭据。发布 API 分别返回 `pushed: true`、`published: false` 和 `deploymentStatus: unverified`；刷新编辑器也不会把快照一致升级成部署成功。
+
 手动验证数据和构建：
 
 ```powershell
